@@ -1,0 +1,158 @@
+<style>
+  .preview-container { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+  .preview-card {
+    flex: 1; min-width: 280px; border: 2px solid #E0E0E0; border-radius: 12px;
+    overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+  }
+  .preview-card:hover { border-color: #F7D154; box-shadow: 0 4px 16px rgba(247,209,84,0.2); }
+  .preview-card.selected { border-color: #FDB750; box-shadow: 0 4px 20px rgba(253,183,80,0.35); }
+  .preview-label {
+    padding: 10px 14px; font-size: 13px; font-weight: 600;
+    background: #FAFAFA; border-top: 1px solid #E0E0E0;
+    color: #2D2D2D; display: flex; align-items: center; justify-content: space-between;
+  }
+  .preview-label .tag { font-size: 11px; font-weight: 400; color: #8B8378; }
+  .mock { padding: 14px; background: #F5F5F5; min-height: 220px; }
+
+  /* Layout A - Centered Hero */
+  .la-hero {
+    background: linear-gradient(135deg, #fff 0%, #FFF8E7 100%);
+    padding: 20px 16px; text-align: center;
+  }
+  .la-badge { display: inline-block; background: #F7D154; color: #2D2D2D; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; letter-spacing: 0.5px; }
+  .la-title { font-size: 22px; font-weight: 700; color: #2D2D2D; line-height: 1.3; margin-bottom: 8px; }
+  .la-sub { font-size: 12px; color: #6A6A6A; line-height: 1.6; margin-bottom: 14px; }
+  .la-cta { display: inline-block; background: #F7D154; color: #2D2D2D; font-size: 12px; font-weight: 700; padding: 9px 22px; border-radius: 8px; }
+  .la-cta2 { display: inline-block; background: transparent; border: 1.5px solid #E0E0E0; color: #4A4A4A; font-size: 12px; font-weight: 500; padding: 9px 18px; border-radius: 8px; margin-left: 8px; }
+  .la-trust { margin-top: 14px; display: flex; justify-content: center; gap: 16px; }
+  .la-trust-item { font-size: 10px; color: #8B8378; text-align: center; }
+  .la-trust-num { font-size: 16px; font-weight: 700; color: #2D2D2D; display: block; }
+
+  /* Layout B - Split (text left, visual right) */
+  .lb-hero {
+    background: #fff;
+    padding: 16px 14px;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .lb-left { flex: 1.2; }
+  .lb-right { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+  .lb-badge { display: inline-block; background: #F7D154; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; color: #2D2D2D; }
+  .lb-title { font-size: 18px; font-weight: 700; color: #2D2D2D; line-height: 1.3; margin-bottom: 6px; }
+  .lb-sub { font-size: 11px; color: #6A6A6A; line-height: 1.6; margin-bottom: 10px; }
+  .lb-cta { display: inline-block; background: #F7D154; color: #2D2D2D; font-size: 11px; font-weight: 700; padding: 8px 18px; border-radius: 8px; }
+  .lb-card { background: #FFF8E7; border: 1px solid #F7D154; border-radius: 8px; padding: 8px 10px; }
+  .lb-card-label { font-size: 10px; color: #8B8378; font-weight: 600; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .lb-card-val { font-size: 12px; font-weight: 700; color: #2D2D2D; }
+  .lb-card.warn { background: #FFF3E0; border-color: #FDB750; }
+
+  /* Layout C - Dark hero header + scroll */
+  .lc-hero {
+    background: #2D2D2D;
+    padding: 18px 14px; text-align: center;
+  }
+  .lc-badge { display: inline-block; background: #F7D154; color: #2D2D2D; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 10px; letter-spacing: 0.5px; }
+  .lc-title { font-size: 20px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 6px; }
+  .lc-sub { font-size: 11px; color: rgba(255,255,255,0.65); line-height: 1.6; margin-bottom: 12px; }
+  .lc-cta { display: inline-block; background: #F7D154; color: #2D2D2D; font-size: 12px; font-weight: 700; padding: 9px 22px; border-radius: 8px; }
+  .lc-features { margin-top: 0; background: #fff; padding: 10px 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .lc-feat { display: flex; align-items: flex-start; gap: 6px; padding: 6px; border-radius: 6px; border: 1px solid #F0F0F0; }
+  .lc-feat-icon { width: 24px; height: 24px; background: #FFF8E7; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .lc-feat-text { font-size: 10px; color: #4A4A4A; line-height: 1.4; }
+  .lc-feat-title { font-size: 11px; font-weight: 600; color: #2D2D2D; }
+</style>
+
+<h2>랜딩 페이지 히어로 섹션 — 레이아웃 선택</h2>
+<p class="subtitle">FADE 서비스의 첫인상을 결정하는 히어로 섹션 구조입니다. 감정적으로 민감한 사용자를 배려한 3가지 방향을 비교해보세요.</p>
+
+<div class="preview-container">
+
+  <!-- Option A -->
+  <div class="preview-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="mock" style="padding:0; background:#fff;">
+      <div class="la-hero">
+        <span class="la-badge">상속 행정 가이드</span>
+        <div class="la-title">처음 겪는 상속,<br>혼자 걱정하지 마세요</div>
+        <div class="la-sub">사망 후 처리해야 할 17개 기관 업무와<br>법정 기한을 한눈에 정리해드립니다</div>
+        <span class="la-cta">무료로 시작하기</span>
+        <span class="la-cta2">서비스 알아보기</span>
+        <div class="la-trust">
+          <div class="la-trust-item"><span class="la-trust-num">17+</span>기관 체크리스트</div>
+          <div class="la-trust-item"><span class="la-trust-num">6개월</span>법정 기한 추적</div>
+          <div class="la-trust-item"><span class="la-trust-num">무료</span>세금 계산기</div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-label">
+      A. 중앙 정렬 히어로
+      <span class="tag">따뜻하고 집중적 · 가장 심플</span>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div class="preview-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="mock" style="padding:0; background:#fff;">
+      <div class="lb-hero">
+        <div class="lb-left">
+          <span class="lb-badge">상속 행정 가이드</span>
+          <div class="lb-title">처음 겪는 상속,<br>혼자 걱정하지<br>마세요</div>
+          <div class="lb-sub">사망 후 처리해야 할 업무와<br>법정 기한을 안내해 드립니다</div>
+          <span class="lb-cta">무료로 시작하기</span>
+        </div>
+        <div class="lb-right">
+          <div class="lb-card warn">
+            <div class="lb-card-label">⚠️ 긴급 기한</div>
+            <div class="lb-card-val">한정승인 신고<br>사망일 + 3개월</div>
+          </div>
+          <div class="lb-card">
+            <div class="lb-card-label">📋 처리할 기관</div>
+            <div class="lb-card-val">17개 이상</div>
+          </div>
+          <div class="lb-card">
+            <div class="lb-card-label">💰 예상 상속세</div>
+            <div class="lb-card-val">무료 계산 가능</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-label">
+      B. 좌우 분할 (정보 카드 강조)
+      <span class="tag">실용적 · 기한 정보 즉시 전달</span>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="preview-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="mock" style="padding:0; background:#fff;">
+      <div class="lc-hero">
+        <span class="lc-badge">상속 행정 가이드</span>
+        <div class="lc-title">처음 겪는 상속,<br>혼자 걱정하지 마세요</div>
+        <div class="lc-sub">17개 기관 체크리스트 · 법정 기한 알림 · 상속세 계산</div>
+        <span class="lc-cta">무료로 시작하기</span>
+      </div>
+      <div class="lc-features">
+        <div class="lc-feat">
+          <div class="lc-feat-icon">📋</div>
+          <div class="lc-feat-text"><div class="lc-feat-title">타임라인 체크리스트</div>기관별 업무 순서대로</div>
+        </div>
+        <div class="lc-feat">
+          <div class="lc-feat-icon">⏰</div>
+          <div class="lc-feat-text"><div class="lc-feat-title">기한 자동 계산</div>한정승인·상속세 기한</div>
+        </div>
+        <div class="lc-feat">
+          <div class="lc-feat-icon">💰</div>
+          <div class="lc-feat-text"><div class="lc-feat-title">상속세 계산기</div>무료 자동 계산</div>
+        </div>
+        <div class="lc-feat">
+          <div class="lc-feat-icon">🤖</div>
+          <div class="lc-feat-text"><div class="lc-feat-title">AI 절세 전략</div>맞춤 시나리오 비교</div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-label">
+      C. 다크 헤더 + 기능 그리드
+      <span class="tag">전문적·신뢰감 · 기능 부각</span>
+    </div>
+  </div>
+
+</div>

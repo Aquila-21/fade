@@ -1,0 +1,214 @@
+<style>
+  .preview-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 12px; }
+  .preview-card {
+    flex: 1; min-width: 280px; border: 2px solid #E0E0E0; border-radius: 12px;
+    overflow: hidden; cursor: pointer; transition: border-color 0.2s, box-shadow 0.2s;
+    background: #fff;
+  }
+  .preview-card:hover { border-color: #A8A196; box-shadow: 0 4px 16px rgba(168,161,150,0.25); }
+  .preview-card.selected { border-color: #8B8378; box-shadow: 0 4px 20px rgba(139,131,120,0.3); }
+  .preview-label {
+    padding: 10px 14px; font-size: 13px; font-weight: 600;
+    background: #FAFAFA; border-top: 1px solid #E0E0E0;
+    color: #2D2D2D; display: flex; align-items: center; justify-content: space-between;
+  }
+  .preview-label .tag { font-size: 11px; font-weight: 400; color: #8B8378; }
+  .mock { padding: 14px; background: #F9F8F6; min-height: 230px; }
+
+  /* --- D1: 수직 타임라인 + 오른쪽 체크리스트 --- */
+  .d1-wrap { display: flex; gap: 10px; }
+  .d1-timeline { width: 140px; flex-shrink: 0; }
+  .d1-tl-header { font-size: 10px; font-weight: 700; color: #8B8378; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .d1-tl-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; position: relative; }
+  .d1-tl-item:not(:last-child)::before {
+    content: ''; position: absolute; left: 9px; top: 20px; width: 2px; height: calc(100% + 4px);
+    background: #E0E0E0;
+  }
+  .d1-dot { width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; z-index: 1; margin-top: 1px; }
+  .d1-dot.done { background: #8B8378; color: #fff; }
+  .d1-dot.urgent { background: #FDB750; color: #fff; }
+  .d1-dot.pending { background: #E8E8E8; color: #AAAAAA; border: 1.5px solid #D0D0D0; }
+  .d1-tl-text { font-size: 10px; color: #4A4A4A; line-height: 1.4; }
+  .d1-tl-date { font-size: 9px; color: #AAAAAA; }
+  .d1-checklist { flex: 1; }
+  .d1-cl-header { font-size: 10px; font-weight: 700; color: #8B8378; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .d1-cl-item { display: flex; align-items: center; gap: 7px; padding: 6px 8px; background: #fff; border-radius: 6px; border: 1px solid #EEEEEE; margin-bottom: 5px; }
+  .d1-cl-check { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
+  .d1-cl-check.checked { background: #8B8378; }
+  .d1-cl-check.unchecked { border: 1.5px solid #D0D0D0; background: #fff; }
+  .d1-cl-text { font-size: 10px; color: #4A4A4A; }
+  .d1-cl-text.done-text { text-decoration: line-through; color: #AAAAAA; }
+  .d1-cl-tag { margin-left: auto; font-size: 9px; padding: 1px 6px; border-radius: 10px; flex-shrink: 0; }
+  .d1-cl-tag.urgent { background: #FFF3E0; color: #E07000; }
+  .d1-cl-tag.normal { background: #F2EFE9; color: #8B8378; }
+
+  /* --- D2: 상단 진행률 + 카드형 타임라인 --- */
+  .d2-progress-bar { background: #E8E8E8; border-radius: 4px; height: 6px; margin-bottom: 12px; overflow: hidden; }
+  .d2-bar { background: #8B8378; width: 35%; height: 6px; border-radius: 4px; }
+  .d2-progress-info { display: flex; justify-content: space-between; font-size: 10px; color: #8B8378; margin-bottom: 6px; }
+  .d2-cards { display: flex; flex-direction: column; gap: 6px; }
+  .d2-card { background: #fff; border-radius: 8px; border: 1px solid #EEEEEE; padding: 9px 11px; display: flex; align-items: center; gap: 8px; }
+  .d2-card.urgent { border-color: #FDB750; background: #FFFDF5; }
+  .d2-card.done { opacity: 0.55; }
+  .d2-icon { width: 28px; height: 28px; border-radius: 7px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .d2-icon.done-bg { background: #F2EFE9; }
+  .d2-icon.urgent-bg { background: #FFF3E0; }
+  .d2-icon.pending-bg { background: #F5F5F5; }
+  .d2-card-body { flex: 1; }
+  .d2-card-title { font-size: 11px; font-weight: 600; color: #2D2D2D; }
+  .d2-card.done .d2-card-title { text-decoration: line-through; color: #AAAAAA; }
+  .d2-card-sub { font-size: 9px; color: #AAAAAA; margin-top: 1px; }
+  .d2-badge { font-size: 9px; padding: 2px 7px; border-radius: 10px; flex-shrink: 0; }
+  .d2-badge.urgent { background: #FFF3E0; color: #E07000; font-weight: 700; }
+  .d2-badge.done { background: #F2EFE9; color: #8B8378; }
+  .d2-badge.pending { background: #F5F5F5; color: #AAAAAA; }
+
+  /* --- D3: 좌측 수직 타임라인 전체 (GitHub 스타일) --- */
+  .d3-item { display: flex; gap: 0; margin-bottom: 0; position: relative; }
+  .d3-left { width: 36px; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+  .d3-dot { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 9px; z-index: 1; }
+  .d3-dot.done { background: #8B8378; color: #fff; }
+  .d3-dot.urgent { background: #FDB750; color: #fff; }
+  .d3-dot.pending { background: #fff; border: 2px solid #D0D0D0; color: #AAAAAA; }
+  .d3-line { width: 2px; flex: 1; background: #E0E0E0; min-height: 14px; }
+  .d3-right { flex: 1; padding-bottom: 10px; padding-top: 1px; }
+  .d3-date { font-size: 9px; color: #AAAAAA; margin-bottom: 2px; }
+  .d3-card { background: #fff; border: 1px solid #EEEEEE; border-radius: 7px; padding: 8px 10px; }
+  .d3-card.urgent { border-color: #FDB750; }
+  .d3-card-title { font-size: 11px; font-weight: 600; color: #2D2D2D; }
+  .d3-card-sub { font-size: 9px; color: #8B8378; margin-top: 2px; }
+  .d3-item:last-child .d3-line { display: none; }
+</style>
+
+<h2>대시보드 — 타임라인 레이아웃 선택</h2>
+<p class="subtitle">사망일 기준 할 일 목록과 진행 상황을 보여주는 대시보드 구조입니다.</p>
+
+<div class="preview-row">
+
+  <!-- D1: 수직 타임라인 + 체크리스트 분할 -->
+  <div class="preview-card" data-choice="d1" onclick="toggleSelect(this)">
+    <div class="mock">
+      <div class="d1-wrap">
+        <div class="d1-timeline">
+          <div class="d1-tl-header">📅 기한 타임라인</div>
+          <div class="d1-tl-item">
+            <div class="d1-dot done">✓</div>
+            <div><div class="d1-tl-text">사망신고</div><div class="d1-tl-date">D+1</div></div>
+          </div>
+          <div class="d1-tl-item">
+            <div class="d1-dot urgent">!</div>
+            <div><div class="d1-tl-text">한정승인 신고</div><div class="d1-tl-date">D+90 · 23일 남음</div></div>
+          </div>
+          <div class="d1-tl-item">
+            <div class="d1-dot pending">○</div>
+            <div><div class="d1-tl-text">상속세 신고</div><div class="d1-tl-date">D+180</div></div>
+          </div>
+        </div>
+        <div class="d1-checklist">
+          <div class="d1-cl-header">✅ 체크리스트</div>
+          <div class="d1-cl-item">
+            <div class="d1-cl-check checked"></div>
+            <div class="d1-cl-text done-text">주민센터 사망신고</div>
+            <span class="d1-cl-tag normal">완료</span>
+          </div>
+          <div class="d1-cl-item">
+            <div class="d1-cl-check unchecked"></div>
+            <div class="d1-cl-text">법원 한정승인 신청</div>
+            <span class="d1-cl-tag urgent">D-23</span>
+          </div>
+          <div class="d1-cl-item">
+            <div class="d1-cl-check unchecked"></div>
+            <div class="d1-cl-text">금융거래 조회 신청</div>
+            <span class="d1-cl-tag normal">진행중</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-label">
+      D1. 타임라인 + 체크리스트 분할
+      <span class="tag">기한·할일 동시 파악</span>
+    </div>
+  </div>
+
+  <!-- D2: 진행률 + 카드형 -->
+  <div class="preview-card" data-choice="d2" onclick="toggleSelect(this)">
+    <div class="mock">
+      <div class="d2-progress-info">
+        <span>전체 진행률</span>
+        <span style="font-weight:700; color:#2D2D2D;">3 / 8 완료</span>
+      </div>
+      <div class="d2-progress-bar"><div class="d2-bar"></div></div>
+      <div class="d2-cards">
+        <div class="d2-card done">
+          <div class="d2-icon done-bg">✓</div>
+          <div class="d2-card-body">
+            <div class="d2-card-title">주민센터 사망신고</div>
+            <div class="d2-card-sub">2024.01.02 완료</div>
+          </div>
+          <span class="d2-badge done">완료</span>
+        </div>
+        <div class="d2-card urgent">
+          <div class="d2-icon urgent-bg">⚠️</div>
+          <div class="d2-card-body">
+            <div class="d2-card-title">법원 한정승인 신청</div>
+            <div class="d2-card-sub">D+90 기한 · 23일 남음</div>
+          </div>
+          <span class="d2-badge urgent">D-23</span>
+        </div>
+        <div class="d2-card">
+          <div class="d2-icon pending-bg">🏦</div>
+          <div class="d2-card-body">
+            <div class="d2-card-title">금융거래 조회 신청</div>
+            <div class="d2-card-sub">안심상속 원스톱 서비스</div>
+          </div>
+          <span class="d2-badge pending">예정</span>
+        </div>
+      </div>
+    </div>
+    <div class="preview-label">
+      D2. 진행률 바 + 카드 목록
+      <span class="tag">진행 상황 한눈에 · 심플</span>
+    </div>
+  </div>
+
+  <!-- D3: 수직 타임라인 전체 -->
+  <div class="preview-card" data-choice="d3" onclick="toggleSelect(this)">
+    <div class="mock">
+      <div class="d3-item">
+        <div class="d3-left">
+          <div class="d3-dot done">✓</div>
+          <div class="d3-line"></div>
+        </div>
+        <div class="d3-right">
+          <div class="d3-date">D+1 · 2024.01.02</div>
+          <div class="d3-card"><div class="d3-card-title">주민센터 사망신고</div><div class="d3-card-sub">완료</div></div>
+        </div>
+      </div>
+      <div class="d3-item">
+        <div class="d3-left">
+          <div class="d3-dot urgent">!</div>
+          <div class="d3-line"></div>
+        </div>
+        <div class="d3-right">
+          <div class="d3-date">D+90 · 2024.04.02 · D-23</div>
+          <div class="d3-card urgent"><div class="d3-card-title">법원 한정승인 신청</div><div class="d3-card-sub">⚠️ 기한 임박 — 반드시 처리</div></div>
+        </div>
+      </div>
+      <div class="d3-item">
+        <div class="d3-left">
+          <div class="d3-dot pending">3</div>
+          <div class="d3-line"></div>
+        </div>
+        <div class="d3-right">
+          <div class="d3-date">D+30 · 2024.02.02</div>
+          <div class="d3-card"><div class="d3-card-title">금융거래 조회 신청</div><div class="d3-card-sub">안심상속 원스톱 서비스</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-label">
+      D3. 수직 타임라인 (GitHub 스타일)
+      <span class="tag">시간 흐름 명확 · 스토리텔링</span>
+    </div>
+  </div>
+
+</div>
